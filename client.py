@@ -1,5 +1,13 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+from database import Database
+import hashlib
+import hashlib
+
+def hash_password(password: str) -> str:
+    """Hashes a password for secure storage."""
+    return hashlib.sha256(password.encode()).hexdigest()
+
 
 class LoginWindow(tk.Toplevel):
     def __init__(self, master):
@@ -7,29 +15,48 @@ class LoginWindow(tk.Toplevel):
         self.master = master
         self.title("Login")
         
+        # Set window size
+        self.window_width = 400  # Updated width for LoginWindow
+        self.window_height = 300  # Updated height for LoginWindow
+        
+        # Get screen size
+        self.screen_width = self.winfo_screenwidth()
+        self.screen_height = self.winfo_screenheight()
+        
+        # Calculate position to center the window on the screen
+        self.x_cordinate = int((self.screen_width/2) - (self.window_width/2))
+        self.y_cordinate = int((self.screen_height/2) - (self.window_height/2))
+        
+        # Set the geometry of the window with calculated coordinates
+        self.geometry("{}x{}+{}+{}".format(self.window_width, self.window_height, self.x_cordinate, self.y_cordinate))
+
         self.label_username = tk.Label(self, text="Username")
         self.label_password = tk.Label(self, text="Password")
         self.entry_username = tk.Entry(self)
         self.entry_password = tk.Entry(self, show="*")
 
-        self.label_username.pack(pady=10)
-        self.entry_username.pack(pady=10)
-        self.label_password.pack(pady=10)
-        self.entry_password.pack(pady=10)
+        self.label_username.pack(pady=20)  # Increased padding for better layout
+        self.entry_username.pack(pady=20)
+        self.label_password.pack(pady=20)
+        self.entry_password.pack(pady=20)
 
         self.button_login = tk.Button(self, text="Login", command=self.validate_login)
-        self.button_login.pack(pady=10)
+        self.button_login.pack(pady=20)
 
     def validate_login(self):
         username = self.entry_username.get()
-        password = self.entry_password.get()
+        hashed_password = hash_password(self.entry_password.get())
 
-        if (username, password) in self.master.user_data:
-            role = self.master.user_data[(username, password)]
+        user = self.master.db.fetch_user_by_username(username)
+        if user and user[1] == hashed_password:  # assuming the order is username, hashed_password, role in the database
+            role = user[2]
             self.master.login_success(role, username)
             self.destroy()
-        else:
-            messagebox.showerror("Invalid Credentials", "Invalid username or password")
+            return
+
+        messagebox.showerror("Invalid Credentials", "Invalid username or password")
+
+
 
 class AddUserWindow(tk.Toplevel):
     def __init__(self, master):
@@ -57,24 +84,31 @@ class AddUserWindow(tk.Toplevel):
 
     def add_user(self):
         new_username = self.entry_username.get()
-        new_password = self.entry_password.get()
+        new_password = hash_password(self.entry_password.get())  # hash the password before storing
         new_role = self.entry_role.get()
 
         if new_role not in ['Admin', 'Normal']:
             messagebox.showerror("Invalid Role", "Role must be Admin or Normal")
             return
-        
-        if (new_username, new_password) in self.master.user_data:
-            messagebox.showerror("User Exists", "User with this username and password already exists")
+
+        # Check in the database if the username already exists
+        existing_user = self.master.db.fetch_user_by_username(new_username)
+        if existing_user:
+            messagebox.showerror("User Exists", "User with this username already exists")
             return
 
-        self.master.user_data[(new_username, new_password)] = new_role
+        # Add the new user to the database
+        self.master.db.add_user(new_username, new_password, new_role)
         messagebox.showinfo("Success", "User added successfully!")
         self.destroy()
+
 
 class GoldStockApp(tk.Tk):
     def __init__(self):
         super().__init__()
+        # Hide the main window at first
+        self.withdraw()
+
         self.title('ห้างทองหวังทองดี')
         
         # ... (your original __init__ code for GoldStockApp)
@@ -100,20 +134,25 @@ class GoldStockApp(tk.Tk):
         self.init_add_gold_interface()
         
         self.show_main_interface()
+        # Creating Database instance
+        self.db = Database('gold_stock.db')
+        self.user_data = {user[0]: user[2] for user in self.db.fetch_users()}
 
-        self.user_data = {
-            ('admin', 'VTDprogram2566'): 'Admin',
-            # Add more users as necessary
-        }
 
         self.login_window = LoginWindow(self)
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.load_stocks_from_db()
         
     def login_success(self, role, username):
+        # Show the main window
+        self.deiconify()
         if role == 'Admin':
+            self.add_user_button = tk.Button(self.main_frame, text="Add User", command=self.show_add_user_interface)
+            self.add_user_button.pack(pady=20)
             self.show_main_interface()
         else:
             self.show_main_interface(username)
+
 
     def on_closing(self):
         if self.login_window:
@@ -187,11 +226,18 @@ class GoldStockApp(tk.Tk):
         
     def add_gold_to_table(self):
         values = [self.entries[col].get() for col in ('วันที่', 'SKU', 'หยิบทองที่', 'ประเภท', 'น้ำหนัก', 'จำนวน', 'User', 'สถานะ')]
-        self.tree.insert('', 'end', values=values)
+        self.db.insert(*values)
+        self.load_stocks_from_db()
         self.show_main_interface()
+
 
     def edit_gold_stock(self):
         EditStockWindow(self)
+
+    def load_stocks_from_db(self):
+        for row in self.db.fetch():
+            self.tree.insert('', 'end', values=row[1:])
+
 
 # ... (your original EditStockWindow and EditStockDetailsWindow classes)
 class EditStockWindow(tk.Toplevel):
@@ -256,11 +302,23 @@ class EditStockDetailsWindow(tk.Toplevel):
     
     def save_edited_gold(self):
         new_values = [self.entries[col].get() for col in ('วันที่', 'SKU', 'หยิบทองที่', 'ประเภท', 'น้ำหนัก', 'จำนวน', 'User', 'สถานะ')]
-        self.master.tree.item(self.selected_item, values=new_values)
-        self.master.master.tree.item(self.selected_item, values=new_values)
+        self.db.update(self.selected_item, *new_values)
+        self.load_stocks_from_db()
         self.destroy()
 
+
 # Create and start the application
-if __name__ == '__main__':
+if __name__ == "__main__":
+    # Create a database object
+    db = Database('gold_stock.db')
+    
+    # Check if the admin user already exists (to avoid creating multiple admins)
+    admin_user = db.fetch_user_by_username('admin')
+    if not admin_user:
+        # If admin doesn't exist, create one with hashed password
+        hashed_admin_password = hash_password('admin')
+        db.insert_user('admin', hashed_admin_password, 'Admin')
+
+    # Now launch the GUI
     app = GoldStockApp()
     app.mainloop()
