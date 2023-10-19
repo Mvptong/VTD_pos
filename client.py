@@ -98,7 +98,7 @@ class AddUserWindow(tk.Toplevel):
             return
 
         # Add the new user to the database
-        self.master.db.add_user(new_username, new_password, new_role)
+        self.master.db.insert_user(new_username, new_password, new_role)
         messagebox.showinfo("Success", "User added successfully!")
         self.destroy()
 
@@ -151,7 +151,16 @@ class GoldStockApp(tk.Tk):
             self.add_user_button.pack(pady=20)
             self.show_main_interface()
         else:
-            self.show_main_interface(username)
+            self.show_user_interface(username)
+    
+    def show_user_interface(self, username):
+        self.main_frame.pack_forget()
+        self.add_frame.pack_forget()
+        self.show_main_interface()  # Display the main interface
+         # Filter and show gold stocks specific to the user
+        self.filter_stocks_by_user(username)
+        self.add_button.pack_forget()
+        self.edit_button.pack_forget()
 
 
     def on_closing(self):
@@ -172,11 +181,11 @@ class GoldStockApp(tk.Tk):
         self.edit_button = tk.Button(self.main_frame, text="Edit Gold Stock", command=self.edit_gold_stock)
         self.edit_button.pack(pady=20)
 
-        if username:
-            self.filter_stocks_by_user(username)
-        else:
-            self.add_user_button = tk.Button(self.main_frame, text="Add User", command=self.show_add_user_interface)
-            self.add_user_button.pack(pady=20)
+        #if username:
+        #    self.filter_stocks_by_user(username)
+        #else:
+        #    self.add_user_button = tk.Button(self.main_frame, text="Add User", command=self.show_add_user_interface)
+        #    self.add_user_button.pack(pady=20)
             
     def show_add_user_interface(self):
         AddUserWindow(self)
@@ -191,12 +200,12 @@ class GoldStockApp(tk.Tk):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         
-        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('วันที่', 'SKU', 'หยิบทองที่', 'ประเภท', 'น้ำหนัก', 'จำนวน', 'User', 'สถานะ'), show='headings')
+        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), show='headings')
         self.tree.pack(pady=20)
         
         self.tree_scroll.config(command=self.tree.yview)
         
-        for col in ('วันที่', 'SKU', 'หยิบทองที่', 'ประเภท', 'น้ำหนัก', 'จำนวน', 'User', 'สถานะ'):
+        for col in ('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
             self.tree.column(col, width=100)
             self.tree.heading(col, text=col)
     
@@ -207,7 +216,7 @@ class GoldStockApp(tk.Tk):
     def init_add_gold_interface(self):
         self.entries = {}
         
-        for col in ('วันที่', 'SKU', 'หยิบทองที่', 'ประเภท', 'น้ำหนัก', 'จำนวน', 'User', 'สถานะ'):
+        for col in ('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
             label = tk.Label(self.add_frame, text=col)
             label.pack(pady=10)
             entry = tk.Entry(self.add_frame)
@@ -225,7 +234,7 @@ class GoldStockApp(tk.Tk):
         self.main_frame.pack(fill="both", expand=True)
         
     def add_gold_to_table(self):
-        values = [self.entries[col].get() for col in ('วันที่', 'SKU', 'หยิบทองที่', 'ประเภท', 'น้ำหนัก', 'จำนวน', 'User', 'สถานะ')]
+        values = [self.entries[col].get() for col in ('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note')]
         self.db.insert(*values)
         self.load_stocks_from_db()
         self.show_main_interface()
@@ -260,12 +269,12 @@ class EditStockWindow(tk.Toplevel):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         
-        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('วันที่', 'SKU', 'หยิบทองที่', 'ประเภท', 'น้ำหนัก', 'จำนวน', 'User', 'สถานะ'), show='headings')
+        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), show='headings')
         self.tree.pack(pady=20)
         
         self.tree_scroll.config(command=self.tree.yview)
         
-        for col in ('วันที่', 'SKU', 'หยิบทองที่', 'ประเภท', 'น้ำหนัก', 'จำนวน', 'User', 'สถานะ'):
+        for col in ('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
             self.tree.column(col, width=100)
             self.tree.heading(col, text=col)
         
@@ -289,7 +298,7 @@ class EditStockDetailsWindow(tk.Toplevel):
         
         self.entries = {}
         
-        for col, val in zip(('วันที่', 'SKU', 'หยิบทองที่', 'ประเภท', 'น้ำหนัก', 'จำนวน', 'User', 'สถานะ'), initial_values):
+        for col, val in zip(('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), initial_values):
             label = tk.Label(self, text=col)
             label.pack(pady=10)
             entry = tk.Entry(self)
@@ -301,7 +310,7 @@ class EditStockDetailsWindow(tk.Toplevel):
         save_edit_btn.pack(pady=20)
     
     def save_edited_gold(self):
-        new_values = [self.entries[col].get() for col in ('วันที่', 'SKU', 'หยิบทองที่', 'ประเภท', 'น้ำหนัก', 'จำนวน', 'User', 'สถานะ')]
+        new_values = [self.entries[col].get() for col in ('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note')]
         self.db.update(self.selected_item, *new_values)
         self.load_stocks_from_db()
         self.destroy()
