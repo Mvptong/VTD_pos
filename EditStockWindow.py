@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-
+from database import Database
 class EditStockWindow(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
@@ -21,12 +21,12 @@ class EditStockWindow(tk.Toplevel):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         
-        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), show='headings')
+        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), show='headings')
         self.tree.pack(pady=20)
         
         self.tree_scroll.config(command=self.tree.yview)
         
-        for col in ('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
+        for col in ('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
             self.tree.column(col, width=100)
             self.tree.heading(col, text=col)
         
@@ -45,12 +45,13 @@ class EditStockDetailsWindow(tk.Toplevel):
         super().__init__(master)
         self.master = master
         self.selected_item = selected_item
+        self.db = Database('gold_stock.db')
 
         self.title("Edit Stock Details")
         
         self.entries = {}
         
-        for col, val in zip(('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), initial_values):
+        for col, val in zip(('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), initial_values):
             label = tk.Label(self, text=col)
             label.pack(pady=10)
             entry = tk.Entry(self)
@@ -62,7 +63,11 @@ class EditStockDetailsWindow(tk.Toplevel):
         save_edit_btn.pack(pady=20)
     
     def save_edited_gold(self):
-        new_values = [self.entries[col].get() for col in ('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note')]
+        new_values = [self.entries[col].get() for col in ('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note')]
         self.db.update(self.selected_item, *new_values)
-        self.load_stocks_from_db()
+        #self.load_stocks_from_db()
         self.destroy()
+    
+    #def load_stocks_from_db(self):
+        #for row in self.db.fetch():
+            #self.tree.insert('', 'end', values=row[1:])

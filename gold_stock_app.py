@@ -5,6 +5,7 @@ from add_user_window import AddUserWindow
 from utils import hash_password
 from database import Database
 from EditStockWindow import EditStockWindow
+from tkcalendar import DateEntry
 
 class GoldStockApp(tk.Tk):
     def __init__(self):
@@ -36,7 +37,7 @@ class GoldStockApp(tk.Tk):
         self.init_main_interface()
         self.init_add_gold_interface()
         
-        self.show_main_interface()
+        #self.show_main_interface()
         # Creating Database instance
         self.db = Database('gold_stock.db')
         self.user_data = {user[0]: user[2] for user in self.db.fetch_users()}
@@ -57,8 +58,8 @@ class GoldStockApp(tk.Tk):
             self.show_user_interface(username)
     
     def show_user_interface(self, username):
-        self.main_frame.pack_forget()
-        self.add_frame.pack_forget()
+        #self.main_frame.pack_forget()
+        #self.add_frame.pack_forget()
         self.show_main_interface()  # Display the main interface
          # Filter and show gold stocks specific to the user
         self.filter_stocks_by_user(username)
@@ -71,8 +72,7 @@ class GoldStockApp(tk.Tk):
             self.login_window.destroy()
         self.destroy()
         
-    def init_main_interface(self, username=None):
-        # ... (your original init_main_interface code for GoldStockApp)
+    def init_main_interface(self):
         self.tree_frame = ttk.Frame(self.main_frame)
         self.tree_frame.pack(pady=20)
         
@@ -96,19 +96,19 @@ class GoldStockApp(tk.Tk):
     def filter_stocks_by_user(self, username):
         for item in self.tree.get_children():
             values = self.tree.item(item, 'values')
-            if values[6] != username:
+            if values[10] != username:
                 self.tree.delete(item)
     
     def init_tree(self, frame):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         
-        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), show='headings')
+        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), show='headings')
         self.tree.pack(pady=20)
         
         self.tree_scroll.config(command=self.tree.yview)
         
-        for col in ('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
+        for col in ('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
             self.tree.column(col, width=100)
             self.tree.heading(col, text=col)
     
@@ -118,8 +118,15 @@ class GoldStockApp(tk.Tk):
     
     def init_add_gold_interface(self):
         self.entries = {}
-        
-        for col in ('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
+        # Add a DateEntry for the 'date' field
+        date_label = tk.Label(self.add_frame, text='date')
+        date_label.pack(pady=10)
+        date_entry = DateEntry(self.add_frame)
+        date_entry.pack(pady=10)
+        self.entries['date'] = date_entry
+
+
+        for col in ('manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
             label = tk.Label(self.add_frame, text=col)
             label.pack(pady=10)
             entry = tk.Entry(self.add_frame)
@@ -137,7 +144,9 @@ class GoldStockApp(tk.Tk):
         self.main_frame.pack(fill="both", expand=True)
         
     def add_gold_to_table(self):
-        values = [self.entries[col].get() for col in ('date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note')]
+        # Get the date as a string
+        values = [self.entries['date'].get_date().isoformat()]
+        values += [self.entries[col].get() for col in ('manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF',  'weightDIFF', 'user', 'note')]
         self.db.insert(*values)
         self.load_stocks_from_db()
         self.show_main_interface()
@@ -148,4 +157,4 @@ class GoldStockApp(tk.Tk):
 
     def load_stocks_from_db(self):
         for row in self.db.fetch():
-            self.tree.insert('', 'end', values=row[1:])
+            self.tree.insert('', 'end', values=row[0:])

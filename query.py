@@ -6,7 +6,7 @@ cursor = conn.cursor()
 
 # Execute a query
 #cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table' ")
-cursor.execute("SELECT * FROM users ")
+cursor.execute("SELECT * FROM gold_stock ")
 rows = cursor.fetchall()
 for row in rows:
     print(row)
