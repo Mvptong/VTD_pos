@@ -16,7 +16,19 @@ class EditStockWindow(tk.Toplevel):
         
         self.edit_button = tk.Button(self, text="Edit Selected Stock", command=self.edit_selected_stock)
         self.edit_button.pack(pady=20)
-    
+
+        self.edit_entries = {}
+
+        for col in ('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
+            label = tk.Label(self, text=col)
+            label.pack(pady=10)
+            entry = tk.Entry(self)
+            entry.pack(pady=10)
+            self.edit_entries[col] = entry
+
+        # Button to save edits
+        save_edit_btn = tk.Button(self, text="Save Edit", command=self.save_edited_gold)
+        save_edit_btn.pack(pady=20)
     def init_tree(self, frame):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -38,36 +50,21 @@ class EditStockWindow(tk.Toplevel):
     def edit_selected_stock(self):
         selected_item = self.tree.selection()[0]
         values = self.tree.item(selected_item, 'values')
-        EditStockDetailsWindow(self, selected_item, *values)
-        
-class EditStockDetailsWindow(tk.Toplevel):
-    def __init__(self, master, selected_item, *initial_values):
-        super().__init__(master)
-        self.master = master
-        self.selected_item = selected_item
-        self.db = Database('gold_stock.db')
 
-        self.title("Edit Stock Details")
-        
-        self.entries = {}
-        
-        for col, val in zip(('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), initial_values):
-            label = tk.Label(self, text=col)
-            label.pack(pady=10)
-            entry = tk.Entry(self)
-            entry.pack(pady=10)
-            entry.insert(0, val)
-            self.entries[col] = entry
-        
-        save_edit_btn = tk.Button(self, text="Save Edit", command=self.save_edited_gold)
-        save_edit_btn.pack(pady=20)
+        # Display the selected stock details in the entry fields for editing
+        for col, value in zip(('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), values):
+            self.edit_entries[col].delete(0, tk.END)
+            self.edit_entries[col].insert(0, value)
     
     def save_edited_gold(self):
-        new_values = [self.entries[col].get() for col in ('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note')]
-        self.db.update(self.selected_item, *new_values)
-        #self.load_stocks_from_db()
+        # Get the edited values from the entry fields
+        new_values = [self.edit_entries[col].get() for col in ('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note')]
+        
+        # Perform the update operation on the database
+        self.master.db.update(new_values[0], *new_values[1:])
+
+        # Reload the stocks in the master tree (assuming you have a method for this)
+        self.master.load_stocks_from_db()
+
+        # Close the edit window
         self.destroy()
-    
-    #def load_stocks_from_db(self):
-        #for row in self.db.fetch():
-            #self.tree.insert('', 'end', values=row[1:])

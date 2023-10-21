@@ -15,10 +15,11 @@ class GoldStockApp(tk.Tk):
 
         self.title('ห้างทองหวังทองดี')
         
+        #self.attributes('-fullscreen', True)
         # ... (your original __init__ code for GoldStockApp)
         # Set window size
-        self.window_width = 1000  # Updated width
-        self.window_height = 500
+        self.window_width = 1300  # Updated width
+        self.window_height = 1300
         
         # Get screen size
         self.screen_width = self.winfo_screenwidth()
