@@ -1,34 +1,41 @@
 import tkinter as tk
 from tkinter import ttk
 from database import Database
+
 class EditStockWindow(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
         self.master = master
         self.title("Edit Gold Stock")
-        
+
         self.tree_frame = ttk.Frame(self)
-        self.tree_frame.pack(pady=20)
-        
+        self.tree_frame.grid(row=0, column=0, pady=20)
+
         self.init_tree(self.tree_frame)
-        
+
         self.load_stocks_from_master()
-        
+
         self.edit_button = tk.Button(self, text="Edit Selected Stock", command=self.edit_selected_stock)
-        self.edit_button.pack(pady=20)
+        self.edit_button.grid(row=1, column=0, pady=20)
 
         self.edit_entries = {}
 
+        row_num = 2  # Starting row number for labels and entry fields
+
         for col in ('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
             label = tk.Label(self, text=col)
-            label.pack(pady=10)
+            label.grid(row=row_num, column=0, pady=10, padx=(20, 5))
+
             entry = tk.Entry(self)
-            entry.pack(pady=10)
+            entry.grid(row=row_num, column=1, pady=10, padx=(25, 5))
             self.edit_entries[col] = entry
+
+            row_num += 1
 
         # Button to save edits
         save_edit_btn = tk.Button(self, text="Save Edit", command=self.save_edited_gold)
-        save_edit_btn.pack(pady=20)
+        save_edit_btn.grid(row=row_num, column=0, columnspan=2, pady=20)
+    
     def init_tree(self, frame):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
