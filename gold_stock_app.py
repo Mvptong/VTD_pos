@@ -97,7 +97,9 @@ class GoldStockApp(tk.Tk):
     def filter_stocks_by_user(self, username):
         for item in self.tree.get_children():
             values = self.tree.item(item, 'values')
-            if values[5] != username:
+            if values[5] != username :
+                self.tree.delete(item)
+            if values[11] == '1':
                 self.tree.delete(item)
     
     def init_tree(self, frame):
@@ -186,4 +188,10 @@ class GoldStockApp(tk.Tk):
         for row in self.tree.get_children():
             self.tree.delete(row)
         for row in self.db.fetch():
+            self.tree.insert('', 'end', values=row[0:])
+
+    def load_stocks_from_db_user(self,user):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+        for row in self.db.fetch_by_userafteredit(user):
             self.tree.insert('', 'end', values=row[0:])

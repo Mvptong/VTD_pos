@@ -24,6 +24,11 @@ class Database:
         self.cur.execute("SELECT * FROM gold_stock WHERE user=%s", (username,))
         rows = self.cur.fetchall()
         return rows
+    
+    def fetch_by_userafteredit(self, username):
+        self.cur.execute("SELECT * FROM gold_stock WHERE user=%s AND is_checked !=1", (username,))
+        rows = self.cur.fetchall()
+        return rows
 
     def fetch_user_by_username(self, username):
         cur = self.conn.cursor()
@@ -48,7 +53,7 @@ class Database:
         self.cur.execute("DELETE FROM gold_stock WHERE id=%s", (id,))
         self.conn.commit()
 
-    def update(self,id_, Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real):
+    def update(self,id_, Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real, is_checked):
         
         self.cur.execute("""
             UPDATE gold_stock SET Date=%s,
@@ -59,8 +64,8 @@ class Database:
             product=%s,
             qtt_doc=%s,
             weight_doc=%s,
-            qtt_real=%s,weight_real=%s  WHERE transaction_id=%s""",
-                         (Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real, id_))
+            qtt_real=%s,weight_real=%s , is_checked=%s WHERE transaction_id=%s""",
+                         (Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real, is_checked, id_))
         
         self.conn.commit()
 
