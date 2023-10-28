@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from database import Database
 
-class EditStockWindow(tk.Toplevel):
+class EditStockAdminWindow(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
         self.master = master
@@ -22,12 +22,12 @@ class EditStockWindow(tk.Toplevel):
 
         row_num = 2  # Starting row number for labels and entry fields
 
-        for col in ('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
+        for col in ('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'):
             label = tk.Label(self, text=col)
-            label.grid(row=row_num, column=0, pady=10, padx=(20, 5))
+            label.grid(row=row_num, column=0, pady=10, padx=(1, 1))
 
             entry = tk.Entry(self)
-            entry.grid(row=row_num, column=1, pady=10, padx=(25, 5))
+            entry.grid(row=row_num, column=2, pady=10, padx=(1, 1))
             self.edit_entries[col] = entry
 
             row_num += 1
@@ -40,12 +40,12 @@ class EditStockWindow(tk.Toplevel):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         
-        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), show='headings')
+        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'), show='headings')
         self.tree.pack(pady=20)
         
         self.tree_scroll.config(command=self.tree.yview)
         
-        for col in ('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
+        for col in ('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'):
             self.tree.column(col, width=100)
             self.tree.heading(col, text=col)
         
@@ -59,13 +59,13 @@ class EditStockWindow(tk.Toplevel):
         values = self.tree.item(selected_item, 'values')
 
         # Display the selected stock details in the entry fields for editing
-        for col, value in zip(('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), values):
+        for col, value in zip(('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'), values):
             self.edit_entries[col].delete(0, tk.END)
             self.edit_entries[col].insert(0, value)
     
     def save_edited_gold(self):
         # Get the edited values from the entry fields
-        new_values = [self.edit_entries[col].get() for col in ('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note')]
+        new_values = [self.edit_entries[col].get() for col in ('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง')]
         
         # Perform the update operation on the database
         self.master.db.update(new_values[0], *new_values[1:])

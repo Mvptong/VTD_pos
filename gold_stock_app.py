@@ -4,7 +4,7 @@ from login_window import LoginWindow
 from add_user_window import AddUserWindow
 from utils import hash_password
 from database import Database
-from EditStockWindow import EditStockWindow
+from EditStockWindow import EditStockAdminWindow
 from tkcalendar import DateEntry
 import datetime
 
@@ -93,19 +93,19 @@ class GoldStockApp(tk.Tk):
     def filter_stocks_by_user(self, username):
         for item in self.tree.get_children():
             values = self.tree.item(item, 'values')
-            if values[4] != username:
+            if values[5] != username:
                 self.tree.delete(item)
     
     def init_tree(self, frame):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         
-        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'), show='headings')
+        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'), show='headings')
         self.tree.pack(pady=20)
         
         self.tree_scroll.config(command=self.tree.yview)
         
-        for col in ('วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'):
+        for col in ('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'):
             self.tree.column(col, width=100)
             self.tree.heading(col, text=col)
     
@@ -173,7 +173,7 @@ class GoldStockApp(tk.Tk):
 
 
     def edit_gold_stock(self):
-        EditStockWindow(self)
+        EditStockAdminWindow(self)
 
     def load_stocks_from_db(self):
         for row in self.tree.get_children():

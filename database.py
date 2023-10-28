@@ -6,7 +6,7 @@ class Database:
         self.cur = self.conn.cursor()
 
     def fetch(self):
-        self.cur.execute("SELECT Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc FROM gold_stock")
+        self.cur.execute("SELECT * FROM gold_stock")
         rows = self.cur.fetchall()
         return rows
 
@@ -48,40 +48,19 @@ class Database:
         self.cur.execute("DELETE FROM gold_stock WHERE id=%s", (id,))
         self.conn.commit()
 
-    def update(self,id,date,
-               manufacture,
-               product,
-               quantityDOC,
-               weightDOC,
-               quantityREAL,
-               weightREAL,
-               quantityDIFF,
-               weightDIFF,user,
-               note):
+    def update(self,id_, Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real):
         
         self.cur.execute("""
-            UPDATE gold_stock SET date=%s,
-            manufacture=%s,
+            UPDATE gold_stock SET Date=%s,
+            Time=%s,
+            id_manu=%s,
+            branch=%s,
+            user=%s,
             product=%s,
-            quantityDOC=%s,
-            weightDOC=%s,
-            quantityREAL=%s,
-            weightREAL=%s,
-            quantityDIFF=%s,
-            weightDIFF=%s,user=%s
-            ,note=%s WHERE id=%s""",
-                         (date
-                          ,manufacture
-                          ,product
-                          ,quantityDOC
-                          ,weightDOC
-                          ,quantityREAL
-                          ,weightREAL
-                          ,quantityDIFF
-                          ,weightDIFF
-                          ,user
-                          ,note
-                          ,id))
+            qtt_doc=%s,
+            weight_doc=%s,
+            qtt_real=%s,weight_real=%s  WHERE transaction_id=%s""",
+                         (Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real, id_))
         
         self.conn.commit()
 
