@@ -56,6 +56,8 @@ class GoldStockApp(tk.Tk):
         if role == 1:
             self.add_user_button = tk.Button(self.main_frame, text="Add User", command=self.show_add_user_interface)
             self.add_user_button.pack(pady=20)
+            self.refresh_button = tk.Button(self.main_frame, text="รีเฟรช", command=self.load_stocks_from_db)
+            self.refresh_button.pack(pady=20)
             self.show_main_interface()
         else:
             self.show_user_interface(username)

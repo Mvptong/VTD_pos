@@ -7,6 +7,20 @@ class AddUserWindow(tk.Toplevel):
         super().__init__(master)
         self.master = master
         self.title("Add User")
+
+        self.window_width = 1300  # Updated width
+        self.window_height = 1300
+        
+        # Get screen size
+        self.screen_width = self.winfo_screenwidth()
+        self.screen_height = self.winfo_screenheight()
+        
+        # Calculate position to center the window on the screen
+        self.x_cordinate = int((self.screen_width/2) - (self.window_width/2))
+        self.y_cordinate = int((self.screen_height/2) - (self.window_height/2))
+        
+        # Set the geometry of the window with calculated coordinates
+        self.geometry("{}x{}+{}+{}".format(self.window_width, self.window_height, self.x_cordinate, self.y_cordinate))
         
         self.label_username = tk.Label(self, text="Username")
         self.label_password = tk.Label(self, text="Password")
