@@ -18,6 +18,8 @@ class EditStockAdminWindow(tk.Toplevel):
         self.edit_button = tk.Button(self, text="Edit Selected Stock", command=self.edit_selected_stock)
         self.edit_button.grid(row=1, column=0, pady=20)
 
+        
+
         self.edit_entries = {}
 
         row_num = 2  # Starting row number for labels and entry fields
