@@ -6,7 +6,7 @@ class Database:
         self.cur = self.conn.cursor()
 
     def fetch(self):
-        self.cur.execute("SELECT * FROM gold_stock")
+        self.cur.execute("SELECT transaction_id, Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real, qtt_doc - qtt_real as qttdiff, weight_doc - weight_real as weightdiff  FROM gold_stock")
         rows = self.cur.fetchall()
         return rows
 
