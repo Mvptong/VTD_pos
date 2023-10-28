@@ -7,6 +7,7 @@ from database import Database
 from EditStockWindow import EditStockAdminWindow
 from tkcalendar import DateEntry
 import datetime
+from EditUserWindow import EditStockUserWindow
 
 class GoldStockApp(tk.Tk):
     def __init__(self):
@@ -80,11 +81,14 @@ class GoldStockApp(tk.Tk):
         
         self.init_tree(self.tree_frame)
         
-        self.add_button = tk.Button(self.main_frame, text="Add Gold", command=self.show_add_gold_interface)
+        self.add_button = tk.Button(self.main_frame, text="ลงทอง", command=self.show_add_gold_interface)
         self.add_button.pack(pady=20)
         
-        self.edit_button = tk.Button(self.main_frame, text="Edit Gold Stock", command=self.edit_gold_stock)
+        self.edit_button = tk.Button(self.main_frame, text="แก้ไขรายการทอง", command=self.edit_gold_stock)
         self.edit_button.pack(pady=20)
+
+        self.edituser_button = tk.Button(self.main_frame, text="เช็ครายการทอง", command=self.edit_gold_by_user)
+        self.edituser_button.pack(pady=20)
 
     
     def show_add_user_interface(self):
@@ -174,6 +178,9 @@ class GoldStockApp(tk.Tk):
 
     def edit_gold_stock(self):
         EditStockAdminWindow(self)
+
+    def edit_gold_by_user(self):
+        EditStockUserWindow(self)
 
     def load_stocks_from_db(self):
         for row in self.tree.get_children():
