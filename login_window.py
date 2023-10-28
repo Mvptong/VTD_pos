@@ -38,10 +38,10 @@ class LoginWindow(tk.Toplevel):
 
     def validate_login(self):
         username = self.entry_username.get()
-        hashed_password = hash_password(self.entry_password.get())
+        hashed_password = self.entry_password.get()
 
         user = self.master.db.fetch_user_by_username(username)
-        if user and user[1] == hashed_password:  # assuming the order is username, hashed_password, role in the database
+        if  user[1] == hashed_password:  # assuming the order is username, hashed_password, role in the database
             role = user[2]
             self.master.login_success(role, username)
             self.destroy()

@@ -28,12 +28,18 @@ class AddUserWindow(tk.Toplevel):
 
     def add_user(self):
         new_username = self.entry_username.get()
-        new_password = hash_password(self.entry_password.get())  # hash the password before storing
+        new_password = self.entry_password.get()  # hash the password before storing
         new_role = self.entry_role.get()
 
-        if new_role not in ['Admin', 'Normal']:
+        if new_role not in ['Admin', 'General']:
             messagebox.showerror("Invalid Role", "Role must be Admin or Normal")
             return
+
+        if new_role == 'Admin':
+            role_add = 1
+
+        if new_role == 'General':
+            role_add = 2
 
         # Check in the database if the username already exists
         existing_user = self.master.db.fetch_user_by_username(new_username)
@@ -42,6 +48,6 @@ class AddUserWindow(tk.Toplevel):
             return
 
         # Add the new user to the database
-        self.master.db.insert_user(new_username, new_password, new_role)
+        self.master.db.insert_user(new_username, new_password, role_add)
         messagebox.showinfo("Success", "User added successfully!")
         self.destroy()

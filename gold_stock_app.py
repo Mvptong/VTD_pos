@@ -6,6 +6,7 @@ from utils import hash_password
 from database import Database
 from EditStockWindow import EditStockWindow
 from tkcalendar import DateEntry
+import datetime
 
 class GoldStockApp(tk.Tk):
     def __init__(self):
@@ -40,7 +41,7 @@ class GoldStockApp(tk.Tk):
         
         #self.show_main_interface()
         # Creating Database instance
-        self.db = Database('gold_stock.db')
+        self.db = Database('localhost', 'test', 'test', 'VTD')
         self.user_data = {user[0]: user[2] for user in self.db.fetch_users()}
 
 
@@ -51,7 +52,7 @@ class GoldStockApp(tk.Tk):
     def login_success(self, role, username):
         # Show the main window
         self.deiconify()
-        if role == 'Admin':
+        if role == 1:
             self.add_user_button = tk.Button(self.main_frame, text="Add User", command=self.show_add_user_interface)
             self.add_user_button.pack(pady=20)
             self.show_main_interface()
@@ -85,11 +86,6 @@ class GoldStockApp(tk.Tk):
         self.edit_button = tk.Button(self.main_frame, text="Edit Gold Stock", command=self.edit_gold_stock)
         self.edit_button.pack(pady=20)
 
-        #if username:
-        #    self.filter_stocks_by_user(username)
-        #else:
-        #    self.add_user_button = tk.Button(self.main_frame, text="Add User", command=self.show_add_user_interface)
-        #    self.add_user_button.pack(pady=20)
     
     def show_add_user_interface(self):
         AddUserWindow(self)
@@ -97,37 +93,46 @@ class GoldStockApp(tk.Tk):
     def filter_stocks_by_user(self, username):
         for item in self.tree.get_children():
             values = self.tree.item(item, 'values')
-            if values[10] != username:
+            if values[4] != username:
                 self.tree.delete(item)
     
     def init_tree(self, frame):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         
-        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'), show='headings')
+        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'), show='headings')
         self.tree.pack(pady=20)
         
         self.tree_scroll.config(command=self.tree.yview)
         
-        for col in ('ID', 'date', 'manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
+        for col in ('วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'):
             self.tree.column(col, width=100)
             self.tree.heading(col, text=col)
     
-    def show_add_gold_interface(self):
-        self.main_frame.pack_forget()
-        self.add_frame.pack(fill="both", expand=True)
-    
     def init_add_gold_interface(self):
+        self.db = Database('localhost', 'test', 'test', 'VTD')
         self.entries = {}
         # Add a DateEntry for the 'date' field
         date_label = tk.Label(self.add_frame, text='date')
         date_label.pack(pady=10)
         date_entry = DateEntry(self.add_frame)
         date_entry.pack(pady=10)
-        self.entries['date'] = date_entry
+        self.entries['วันที่'] = date_entry
 
+        # Add a Label and Entry for the 'time' field
+        time_label = tk.Label(self.add_frame, text='time')
+        time_label.pack(pady=10)
+        time_entry = tk.Entry(self.add_frame)
+        time_entry.pack(pady=10)
+        self.entries['เวลา'] = time_entry
 
-        for col in ('manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF', 'weightDIFF', 'user', 'note'):
+        user_label = tk.Label(self.add_frame, text='ผู้ตรวจ')
+        user_label.pack(pady=10)
+        user_entry = ttk.Combobox(self.add_frame, values=self.db.fetch_usernames())
+        user_entry.pack(pady=10)
+        self.entries['ผู้ตรวจ'] = user_entry
+
+        for col in ('เลขที่อ้างอิงผู้ผลิต','สาขา','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร'):
             label = tk.Label(self.add_frame, text=col)
             label.pack(pady=10)
             entry = tk.Entry(self.add_frame)
@@ -139,6 +144,20 @@ class GoldStockApp(tk.Tk):
 
         self.back_btn = tk.Button(self.add_frame, text="Back", command=self.show_main_interface)
         self.back_btn.pack(pady=20)
+
+    def show_add_gold_interface(self):
+        # Clear all entries
+        for entry in self.entries.values():
+            entry.delete(0, 'end')
+    
+        # Set current date and time
+        self.entries['วันที่'].set_date(datetime.date.today())
+        self.entries['เวลา'].delete(0, 'end')
+        self.entries['เวลา'].insert(0, datetime.datetime.now().strftime("%H:%M:%S"))
+    
+        self.main_frame.pack_forget()
+        self.add_frame.pack(fill="both", expand=True)
+
         
     def show_main_interface(self):
         self.add_frame.pack_forget()
@@ -146,8 +165,8 @@ class GoldStockApp(tk.Tk):
         
     def add_gold_to_table(self):
         # Get the date as a string
-        values = [self.entries['date'].get_date().isoformat()]
-        values += [self.entries[col].get() for col in ('manufacture', 'product', 'quantityDOC', 'weightDOC', 'quantityREAL', 'weightREAL', 'quantityDIFF',  'weightDIFF', 'user', 'note')]
+        values = [self.entries['วันที่'].get_date().isoformat()]
+        values += [self.entries[col].get() for col in ('เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร')]
         self.db.insert(*values)
         self.load_stocks_from_db()
         self.show_main_interface()
@@ -157,5 +176,7 @@ class GoldStockApp(tk.Tk):
         EditStockWindow(self)
 
     def load_stocks_from_db(self):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
         for row in self.db.fetch():
             self.tree.insert('', 'end', values=row[0:])
