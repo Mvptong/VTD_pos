@@ -119,7 +119,7 @@ class GoldStockApp(tk.Tk):
         # Add a DateEntry for the 'date' field
         date_label = tk.Label(self.add_frame, text='date')
         date_label.grid(row=0, column=0, pady=10)
-        date_entry = DateEntry(self.add_frame)
+        date_entry = DateEntry(self.add_frame, date_pattern='dd/mm/y')
         date_entry.grid(row=0, column=1, pady=10)
         self.entries['วันที่'] = date_entry
 

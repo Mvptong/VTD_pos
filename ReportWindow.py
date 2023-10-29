@@ -1,9 +1,14 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 from tkcalendar import DateEntry
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from database import Database
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib.pagesizes import landscape
+from reportlab.lib import colors
 
 class ReportAdminWindow(tk.Toplevel):
     def __init__(self, master):
@@ -33,7 +38,7 @@ class ReportAdminWindow(tk.Toplevel):
         self.load_stocks_all_db()
 
         # Add date filter
-        self.start_date = DateEntry(self.row1_frame)
+        self.start_date = DateEntry(self.row1_frame, date_pattern='dd/mm/y')
         self.start_date.grid(row=2, column=0)
         self.filter_button = tk.Button(self.row1_frame, text="Filter by Date", command=self.filter_by_date)
         self.filter_button.grid(row=2, column=2)
@@ -67,14 +72,41 @@ class ReportAdminWindow(tk.Toplevel):
         for row in self.db.fetch_by_date(date):
             self.tree.insert('', 'end', values=row[0:])
 
+
     def save_to_pdf(self):
-        data = []  # This should contain all data from the tree view
-        c = canvas.Canvas("output.pdf", pagesize=letter)
-        width, height = letter
-        for i, row in enumerate(data):
-            for j, item in enumerate(row):
-                c.drawString(j * 100 + 50, height - i * 100 - 50, str(item))
-        c.save()
+        # Open a save file dialog
+        file_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")])
+    
+        if not file_path:  # If no file path is selected, return
+            return
+    
+        # Fetch all data from the tree view
+        data = [self.tree.item(item)["values"] for item in self.tree.get_children()]
+    
+        # Create a Table with the data and add it to the elements to be added to the PDF
+        table = Table(data)
+        
+        # Create a TableStyle and add it to the table
+        style = TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.grey),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+    
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0,0), (-1,0), 14),
+    
+            ('BOTTOMPADDING', (0,0), (-1,0), 12),
+            ('BACKGROUND', (0,1), (-1,-1), colors.beige),
+            ('GRID', (0,0), (-1,-1), 1, colors.black)
+        ])
+        table.setStyle(style)
+    
+        # Build the PDF
+        doc = SimpleDocTemplate(file_path, pagesize=landscape(letter))
+        elements = []
+        elements.append(table)
+        doc.build(elements)
+
 
     def load_stocks_all_db(self):
         for row in self.tree.get_children():
