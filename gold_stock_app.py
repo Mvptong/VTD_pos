@@ -7,6 +7,7 @@ from EditStockWindow import EditStockAdminWindow
 from tkcalendar import DateEntry
 import datetime
 from EditUserWindow import EditStockUserWindow
+from ReportWindow import ReportAdminWindow
 
 class GoldStockApp(tk.Tk):
     def __init__(self):
@@ -46,6 +47,8 @@ class GoldStockApp(tk.Tk):
             self.add_user_button.pack(pady=20)
             self.refresh_button = tk.Button(self.main_frame, text="รีเฟรช", command=self.load_stocks_from_db)
             self.refresh_button.pack(pady=20)
+            self.report_button = tk.Button(self.main_frame, text="ดูรีพอร์ท", command=self.show_report_admin_interface)
+            self.report_button.pack(pady=20)
             self.show_main_interface()
         else:
             self.show_user_interface(username)
@@ -83,6 +86,9 @@ class GoldStockApp(tk.Tk):
     
     def show_add_user_interface(self):
         AddUserWindow(self)
+    
+    def show_report_admin_interface(self):
+        ReportAdminWindow(self)
 
     def filter_stocks_by_user(self, username):
         for item in self.tree.get_children():
@@ -107,39 +113,39 @@ class GoldStockApp(tk.Tk):
     
     def init_add_gold_interface(self):
         self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
-    
+
         self.entries = {}
-    
+
         # Add a DateEntry for the 'date' field
         date_label = tk.Label(self.add_frame, text='date')
         date_label.grid(row=0, column=0, pady=10)
         date_entry = DateEntry(self.add_frame)
         date_entry.grid(row=0, column=1, pady=10)
         self.entries['วันที่'] = date_entry
-    
+
         # Add a Label and Entry for the 'time' field
         time_label = tk.Label(self.add_frame, text='time')
         time_label.grid(row=0, column=2, pady=10)
         time_entry = tk.Entry(self.add_frame)
         time_entry.grid(row=0, column=3, pady=10)
         self.entries['เวลา'] = time_entry
-    
+
         user_label = tk.Label(self.add_frame, text='ผู้ตรวจ')
         user_label.grid(row=1, column=0, pady=10)
         user_entry = ttk.Combobox(self.add_frame, values=self.db.fetch_usernames())
         user_entry.grid(row=1, column=1, pady=10)
         self.entries['ผู้ตรวจ'] = user_entry
-    
+
         for i, col in enumerate(('เลขที่อ้างอิงผู้ผลิต','สาขา','สินค้า','จำนวนตามเอกสาร', 'น้ำหนักตามเอกสาร')):
             label = tk.Label(self.add_frame, text=col)
             label.grid(row=i+2, column=0, pady=10)
             entry = tk.Entry(self.add_frame)
             entry.grid(row=i+2, column=1, pady=10)
             self.entries[col] = entry
-    
+
         self.submit_btn = tk.Button(self.add_frame, text="Add Stock", command=self.add_gold_to_table)
         self.submit_btn.grid(row=i+3, column=0, columnspan=2, pady=20)
-    
+
         self.back_btn = tk.Button(self.add_frame, text="Back", command=self.show_main_interface)
         self.back_btn.grid(row=i+4, column=0, columnspan=2, pady=20)
 

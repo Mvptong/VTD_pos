@@ -49,11 +49,14 @@ class EditStockUserWindow(tk.Toplevel):
             else:
                 entry = tk.Entry(self.rest_frame)
                 entry.grid(row=row_num + i // 2, column=i % 2 * 2 + 1)
-                self.edit_entries[col] = entry
+
+            # Add empty columns on either side of the labels and entries to center them
+            self.rest_frame.grid_columnconfigure(0, weight=1)  
+            self.rest_frame.grid_columnconfigure(3, weight=1)  
 
         # Button to save edits
         save_edit_btn = tk.Button(self.rest_frame, text="Save Edit", command=self.save_edited_gold)
-        save_edit_btn.grid(row=row_num + len(self.edit_entries) // 2 + 1, column=0, columnspan=4)
+        save_edit_btn.grid(row=row_num + len(self.edit_entries) // 2 + 2, column=0, columnspan=4)
 
 
     
