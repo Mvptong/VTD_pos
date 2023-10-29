@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 from login_window import LoginWindow
 from add_user_window import AddUserWindow
-from utils import hash_password
 from database import Database
 from EditStockWindow import EditStockAdminWindow
 from tkcalendar import DateEntry
@@ -16,23 +15,10 @@ class GoldStockApp(tk.Tk):
         self.withdraw()
 
         self.title('ห้างทองหวังทองดี')
-        
-        #self.attributes('-fullscreen', True)
         # ... (your original __init__ code for GoldStockApp)
-        # Set window size
-        self.window_width = 1300  # Updated width
-        self.window_height = 1300
-        
-        # Get screen size
-        self.screen_width = self.winfo_screenwidth()
-        self.screen_height = self.winfo_screenheight()
-        
-        # Calculate position to center the window on the screen
-        self.x_cordinate = int((self.screen_width/2) - (self.window_width/2))
-        self.y_cordinate = int((self.screen_height/2) - (self.window_height/2))
-        
-        # Set the geometry of the window with calculated coordinates
-        self.geometry("{}x{}+{}+{}".format(self.window_width, self.window_height, self.x_cordinate, self.y_cordinate))
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        self.geometry(f'{screen_width-100}x{screen_height-100}')
 
         self.main_frame = ttk.Frame(self)
         self.add_frame = ttk.Frame(self)
@@ -42,7 +28,8 @@ class GoldStockApp(tk.Tk):
         
         #self.show_main_interface()
         # Creating Database instance
-        self.db = Database('localhost', 'test', 'test', 'VTD')
+        self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
+
         self.user_data = {user[0]: user[2] for user in self.db.fetch_users()}
 
 
@@ -52,6 +39,7 @@ class GoldStockApp(tk.Tk):
         
     def login_success(self, role, username):
         # Show the main window
+        self.state('zoomed')
         self.deiconify()
         if role == 1:
             self.add_user_button = tk.Button(self.main_frame, text="Add User", command=self.show_add_user_interface)
@@ -108,7 +96,7 @@ class GoldStockApp(tk.Tk):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         
-        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง','ส่วนต่างจำนวน', 'ส่วนต่างน้ำหนัก'), show='headings', height = 20)
+        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง','ส่วนต่างจำนวน', 'ส่วนต่างน้ำหนัก'), show='headings', height = 12)
         self.tree.pack(pady=20)
         
         self.tree_scroll.config(command=self.tree.yview)
@@ -118,40 +106,42 @@ class GoldStockApp(tk.Tk):
             self.tree.heading(col, text=col)
     
     def init_add_gold_interface(self):
-        self.db = Database('localhost', 'test', 'test', 'VTD')
+        self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
+    
         self.entries = {}
+    
         # Add a DateEntry for the 'date' field
         date_label = tk.Label(self.add_frame, text='date')
-        date_label.pack(pady=10)
+        date_label.grid(row=0, column=0, pady=10)
         date_entry = DateEntry(self.add_frame)
-        date_entry.pack(pady=10)
+        date_entry.grid(row=0, column=1, pady=10)
         self.entries['วันที่'] = date_entry
-
+    
         # Add a Label and Entry for the 'time' field
         time_label = tk.Label(self.add_frame, text='time')
-        time_label.pack(pady=10)
+        time_label.grid(row=0, column=2, pady=10)
         time_entry = tk.Entry(self.add_frame)
-        time_entry.pack(pady=10)
+        time_entry.grid(row=0, column=3, pady=10)
         self.entries['เวลา'] = time_entry
-
+    
         user_label = tk.Label(self.add_frame, text='ผู้ตรวจ')
-        user_label.pack(pady=10)
+        user_label.grid(row=1, column=0, pady=10)
         user_entry = ttk.Combobox(self.add_frame, values=self.db.fetch_usernames())
-        user_entry.pack(pady=10)
+        user_entry.grid(row=1, column=1, pady=10)
         self.entries['ผู้ตรวจ'] = user_entry
-
-        for col in ('เลขที่อ้างอิงผู้ผลิต','สาขา','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร'):
+    
+        for i, col in enumerate(('เลขที่อ้างอิงผู้ผลิต','สาขา','สินค้า','จำนวนตามเอกสาร', 'น้ำหนักตามเอกสาร')):
             label = tk.Label(self.add_frame, text=col)
-            label.pack(pady=10)
+            label.grid(row=i+2, column=0, pady=10)
             entry = tk.Entry(self.add_frame)
-            entry.pack(pady=10)
+            entry.grid(row=i+2, column=1, pady=10)
             self.entries[col] = entry
-
+    
         self.submit_btn = tk.Button(self.add_frame, text="Add Stock", command=self.add_gold_to_table)
-        self.submit_btn.pack(pady=20)
-
+        self.submit_btn.grid(row=i+3, column=0, columnspan=2, pady=20)
+    
         self.back_btn = tk.Button(self.add_frame, text="Back", command=self.show_main_interface)
-        self.back_btn.pack(pady=20)
+        self.back_btn.grid(row=i+4, column=0, columnspan=2, pady=20)
 
     def show_add_gold_interface(self):
         # Clear all entries

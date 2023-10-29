@@ -8,8 +8,9 @@ class AddUserWindow(tk.Toplevel):
         self.master = master
         self.title("Add User")
 
-        self.window_width = 1300  # Updated width
-        self.window_height = 1300
+        # Set window size
+        self.window_width = 400  # Updated width for LoginWindow
+        self.window_height = 300  # Updated height for LoginWindow
         
         # Get screen size
         self.screen_width = self.winfo_screenwidth()

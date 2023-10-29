@@ -7,55 +7,55 @@ class EditStockUserWindow(tk.Toplevel):
         super().__init__(master)
         self.master = master
         self.title("Edit Gold Stock")
-        # Set window size
-        self.window_width = 1300  # Updated width
-        self.window_height = 1300  # Updated height
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        self.geometry(f'{screen_width-100}x{screen_height-100}')
+        self.state('zoomed')
 
-        # Get screen size
-        self.screen_width = self.winfo_screenwidth()
-        self.screen_height = self.winfo_screenheight()
+        # Create a main frame
+        self.main_frame = ttk.Frame(self)
+        self.main_frame.grid(sticky='nsew')
 
-        # Calculate position coordinates to center the window
-        self.x_cordinate = int((self.screen_width/2) - (self.window_width/2))
-        self.y_cordinate = int((self.screen_height/2) - (self.window_height/2))
+        # Create a frame for the first row
+        self.row1_frame = ttk.Frame(self.main_frame)
+        self.row1_frame.grid(row=0, column=0, sticky='nsew')
 
-        # Position the window in the center of the screen
-        self.geometry("{}x{}+{}+{}".format(self.window_width, self.window_height, self.x_cordinate, self.y_cordinate))
-
-        self.tree_frame = ttk.Frame(self)
-        self.tree_frame.grid(row=0, column=0, pady=20)
+        self.tree_frame = ttk.Frame(self.row1_frame)
+        self.tree_frame.grid(row=0, column=0)
 
         self.init_tree(self.tree_frame)
 
         self.load_stocks_from_master()
 
-        self.edit_button = tk.Button(self, text="Edit Selected Stock", command=self.edit_selected_stock)
-        self.edit_button.grid(row=1, column=0, pady=20)
+        self.edit_button = tk.Button(self.row1_frame, text="Edit Selected Stock", command=self.edit_selected_stock)
+        self.edit_button.grid(row=1, column=0)
 
-        
+        # Create a frame for the rest of the rows
+        self.rest_frame = ttk.Frame(self.main_frame)
+        self.rest_frame.grid(row=1, column=0, sticky='nsew')
 
         self.edit_entries = {}
 
-        row_num = 2  # Starting row number for labels and entry fields
+        row_num = 0  # Starting row number for labels and entry fields
 
-        for col in ('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'):
-            label = tk.Label(self, text=col)
-            label.grid(row=row_num, column=0, pady=10, padx=(1, 1))
+        for i, col in enumerate(('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง')):
+            label = tk.Label(self.rest_frame, text=col)
+            label.grid(row=row_num + i // 2, column=i % 2 * 2)
 
             if col in ('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร'):
-                value_label = tk.Label(self)
-                value_label.grid(row=row_num, column=2, pady=10, padx=(1, 1))
+                value_label = tk.Label(self.rest_frame)
+                value_label.grid(row=row_num + i // 2, column=i % 2 * 2 + 1)
                 self.edit_entries[col] = value_label
             else:
-                entry = tk.Entry(self)
-                entry.grid(row=row_num, column=2, pady=10, padx=(1, 1))
+                entry = tk.Entry(self.rest_frame)
+                entry.grid(row=row_num + i // 2, column=i % 2 * 2 + 1)
                 self.edit_entries[col] = entry
 
-            row_num += 1
-
         # Button to save edits
-        save_edit_btn = tk.Button(self, text="Save Edit", command=self.save_edited_gold)
-        save_edit_btn.grid(row=row_num, column=0, columnspan=2, pady=20)
+        save_edit_btn = tk.Button(self.rest_frame, text="Save Edit", command=self.save_edited_gold)
+        save_edit_btn.grid(row=row_num + len(self.edit_entries) // 2 + 1, column=0, columnspan=4)
+
+
     
     def init_tree(self, frame):
         self.tree_scroll = ttk.Scrollbar(frame)

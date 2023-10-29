@@ -68,6 +68,22 @@ class Database:
                          (Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real, is_checked, id_))
         
         self.conn.commit()
+    
+    def update2(self,id_, Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real):
+        
+        self.cur.execute("""
+            UPDATE gold_stock SET Date=%s,
+            Time=%s,
+            id_manu=%s,
+            branch=%s,
+            user=%s,
+            product=%s,
+            qtt_doc=%s,
+            weight_doc=%s,
+            qtt_real=%s,weight_real=%s WHERE transaction_id=%s""",
+                         (Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real, id_))
+        
+        self.conn.commit()
 
     def close(self):
         if hasattr(self,'cur'):
