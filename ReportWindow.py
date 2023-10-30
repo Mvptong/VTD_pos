@@ -21,6 +21,7 @@ class ReportAdminWindow(tk.Toplevel):
         self.state('zoomed')
 
         self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
+        #self.db = Database('localhost', 'admin', 'adminvtd', 'vtd')
 
         # Create a main frame
         self.main_frame = ttk.Frame(self)

@@ -30,6 +30,7 @@ class GoldStockApp(tk.Tk):
         #self.show_main_interface()
         # Creating Database instance
         self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
+        #self.db = Database('localhost', 'admin', 'adminvtd', 'vtd')
 
         self.user_data = {user[0]: user[2] for user in self.db.fetch_users()}
 
@@ -95,24 +96,25 @@ class GoldStockApp(tk.Tk):
             values = self.tree.item(item, 'values')
             if values[5] != username :
                 self.tree.delete(item)
-            if values[11] == '1':
+            if values[13] == '1':
                 self.tree.delete(item)
     
     def init_tree(self, frame):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         
-        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง','ส่วนต่างจำนวน', 'ส่วนต่างน้ำหนัก'), show='headings', height = 12)
+        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง','ส่วนต่างจำนวน', 'ส่วนต่างน้ำหนัก', 'เช็ค'), show='headings', height = 12)
         self.tree.pack(pady=20)
         
         self.tree_scroll.config(command=self.tree.yview)
         
-        for col in ('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง','ส่วนต่างจำนวน', 'ส่วนต่างน้ำหนัก'):
+        for col in ('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง','ส่วนต่างจำนวน', 'ส่วนต่างน้ำหนัก','เช็ค'):
             self.tree.column(col, width=100)
             self.tree.heading(col, text=col)
     
     def init_add_gold_interface(self):
         self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
+        #self.db = Database('localhost', 'admin', 'adminvtd', 'vtd')
 
         self.entries = {}
 

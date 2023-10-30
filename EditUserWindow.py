@@ -49,6 +49,7 @@ class EditStockUserWindow(tk.Toplevel):
             else:
                 entry = tk.Entry(self.rest_frame)
                 entry.grid(row=row_num + i // 2, column=i % 2 * 2 + 1)
+                self.edit_entries[col] = entry
 
             # Add empty columns on either side of the labels and entries to center them
             self.rest_frame.grid_columnconfigure(0, weight=1)  

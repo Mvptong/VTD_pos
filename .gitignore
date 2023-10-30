@@ -1,3 +1,10 @@
 Example/*
 *.png
 *.db
+build/*
+dist/*
+*.pyc
+*.json
+*.spec
+add_gold_window.py
+testconnectDB.py

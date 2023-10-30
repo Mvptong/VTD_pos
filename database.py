@@ -6,7 +6,7 @@ class Database:
         self.cur = self.conn.cursor()
 
     def fetch(self):
-        self.cur.execute("SELECT transaction_id, Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real, qtt_doc - qtt_real as qttdiff, weight_doc - weight_real as weightdiff  FROM gold_stock WHERE Date = CURDATE()")
+        self.cur.execute("SELECT transaction_id, Date, Time, id_manu, branch, user, product, qtt_doc, weight_doc, qtt_real, weight_real, qtt_doc - qtt_real as qttdiff, weight_doc - weight_real as weightdiff, is_checked  FROM gold_stock WHERE Date = CURDATE()")
         rows = self.cur.fetchall()
         return rows
     
@@ -37,7 +37,7 @@ class Database:
         return rows
     
     def fetch_by_userafteredit(self, username):
-        self.cur.execute("SELECT * FROM gold_stock WHERE user=%s AND is_checked !=1", (username,))
+        self.cur.execute("SELECT * FROM gold_stock WHERE user=%s AND is_checked !=1 AND Date = CURDATE()", (username,))
         rows = self.cur.fetchall()
         return rows
 
