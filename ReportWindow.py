@@ -9,6 +9,9 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib.pagesizes import landscape
 from reportlab.lib import colors
+import socket
+
+hostname = socket.gethostname()
 
 class ReportAdminWindow(tk.Toplevel):
     def __init__(self, master):
@@ -20,8 +23,10 @@ class ReportAdminWindow(tk.Toplevel):
         self.geometry(f'{screen_width-100}x{screen_height-100}')
         self.state('zoomed')
 
-        self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
-        #self.db = Database('localhost', 'admin', 'adminvtd', 'vtd')
+        if hostname == 'Chanawee_PC':
+            self.db = Database('localhost', 'admin', 'adminvtd', 'vtd')
+        else:
+            self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
 
         # Create a main frame
         self.main_frame = ttk.Frame(self)

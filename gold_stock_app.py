@@ -8,6 +8,9 @@ from tkcalendar import DateEntry
 import datetime
 from EditUserWindow import EditStockUserWindow
 from ReportWindow import ReportAdminWindow
+import socket
+
+hostname = socket.gethostname()
 
 class GoldStockApp(tk.Tk):
     def __init__(self):
@@ -25,12 +28,15 @@ class GoldStockApp(tk.Tk):
         self.add_frame = ttk.Frame(self)
 
         self.init_main_interface()
-        self.init_add_gold_interface()
+        self.init_add_gold_interface(hostname)
         
         #self.show_main_interface()
         # Creating Database instance
-        self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
-        #self.db = Database('localhost', 'admin', 'adminvtd', 'vtd')
+        
+        if hostname == 'Chanawee_PC':
+            self.db = Database('localhost', 'admin', 'adminvtd', 'vtd')
+        else:
+            self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
 
         self.user_data = {user[0]: user[2] for user in self.db.fetch_users()}
 
@@ -112,9 +118,12 @@ class GoldStockApp(tk.Tk):
             self.tree.column(col, width=100)
             self.tree.heading(col, text=col)
     
-    def init_add_gold_interface(self):
-        self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
-        #self.db = Database('localhost', 'admin', 'adminvtd', 'vtd')
+    def init_add_gold_interface(self, hostname):
+        if hostname == 'Chanawee_PC':
+            self.db = Database('localhost', 'admin', 'adminvtd', 'vtd')
+        else:
+            self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
+        
 
         self.entries = {}
 
