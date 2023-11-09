@@ -10,7 +10,7 @@ class LoginWindow(tk.Toplevel):
         
         # Set window size
         self.window_width = 400  # Updated width for LoginWindow
-        self.window_height = 300  # Updated height for LoginWindow
+        self.window_height = 400  # Updated height for LoginWindow
         
         # Get screen size
         self.screen_width = self.winfo_screenwidth()
@@ -25,8 +25,8 @@ class LoginWindow(tk.Toplevel):
 
         self.label_username = tk.Label(self, text="Username")
         self.label_password = tk.Label(self, text="Password")
-        self.entry_username = tk.Entry(self)
-        self.entry_password = tk.Entry(self, show="*")
+        self.entry_username = tk.Entry(self, font=("Helvetica", 20))
+        self.entry_password = tk.Entry(self, show="*", font=("Helvetica", 20))
 
         self.label_username.pack(pady=20)  # Increased padding for better layout
         self.entry_username.pack(pady=20)

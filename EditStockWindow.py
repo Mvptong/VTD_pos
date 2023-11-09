@@ -42,7 +42,7 @@ class EditStockAdminWindow(tk.Toplevel):
             label = tk.Label(self.rest_frame, text=col)
             label.grid(row=row_num + i // 2, column=i % 2 * 2)
 
-            entry = tk.Entry(self.rest_frame)
+            entry = tk.Entry(self.rest_frame, font=("Helvetica", 20))
             entry.grid(row=row_num + i // 2, column=i % 2 * 2 + 1)
             self.edit_entries[col] = entry
 

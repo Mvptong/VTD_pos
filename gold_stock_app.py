@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, font
 from login_window import LoginWindow
 from add_user_window import AddUserWindow
 from database import Database
@@ -17,7 +17,8 @@ class GoldStockApp(tk.Tk):
         super().__init__()
         # Hide the main window at first
         self.withdraw()
-
+        default_font = font.nametofont("TkDefaultFont")
+        default_font.configure(size=20)
         self.title('ห้างทองหวังทองดี')
         # ... (your original __init__ code for GoldStockApp)
         screen_width = self.winfo_screenwidth()
@@ -123,42 +124,57 @@ class GoldStockApp(tk.Tk):
             self.db = Database('localhost', 'admin', 'adminvtd', 'vtd')
         else:
             self.db = Database('2403:6200:8846:62be:ced3:a061:6091:74b0', 'admin', 'adminvtd', 'vtd')
-        
-
+    
         self.entries = {}
-
+    
         # Add a DateEntry for the 'date' field
-        date_label = tk.Label(self.add_frame, text='date')
-        date_label.grid(row=0, column=0, pady=10)
-        date_entry = DateEntry(self.add_frame, date_pattern='dd/mm/y')
-        date_entry.grid(row=0, column=1, pady=10)
+        date_label = tk.Label(self.add_frame, text='Date:')
+        date_label.grid(row=0, column=0, pady=10, padx=(10, 0), sticky='e')
+        date_entry = DateEntry(self.add_frame, date_pattern='dd/mm/y', font=("Helvetica", 20))
+        date_entry.grid(row=0, column=1, pady=10, padx=(0, 10), sticky='w')
         self.entries['วันที่'] = date_entry
-
+    
         # Add a Label and Entry for the 'time' field
-        time_label = tk.Label(self.add_frame, text='time')
-        time_label.grid(row=0, column=2, pady=10)
-        time_entry = tk.Entry(self.add_frame)
-        time_entry.grid(row=0, column=3, pady=10)
+        time_label = tk.Label(self.add_frame, text='Time:')
+        time_label.grid(row=1, column=0, pady=10, padx=(10, 0), sticky='e')
+        time_entry = tk.Entry(self.add_frame, font=("Helvetica", 20))
+        time_entry.grid(row=1, column=1, pady=10, padx=(0, 10), sticky='w')
         self.entries['เวลา'] = time_entry
-
-        user_label = tk.Label(self.add_frame, text='ผู้ตรวจ')
-        user_label.grid(row=1, column=0, pady=10)
-        user_entry = ttk.Combobox(self.add_frame, values=self.db.fetch_usernames())
-        user_entry.grid(row=1, column=1, pady=10)
+    
+        user_label = tk.Label(self.add_frame, text='ผู้ตรวจ:')
+        user_label.grid(row=2, column=0, pady=10, padx=(10, 0), sticky='e')
+        user_entry = ttk.Combobox(self.add_frame, values=self.db.fetch_usernames(), font=("Helvetica", 20))
+        user_entry.grid(row=2, column=1, pady=10, padx=(0, 10), sticky='w')
         self.entries['ผู้ตรวจ'] = user_entry
-
-        for i, col in enumerate(('เลขที่อ้างอิงผู้ผลิต','สาขา','สินค้า','จำนวนตามเอกสาร', 'น้ำหนักตามเอกสาร')):
-            label = tk.Label(self.add_frame, text=col)
-            label.grid(row=i+2, column=0, pady=10)
-            entry = tk.Entry(self.add_frame)
-            entry.grid(row=i+2, column=1, pady=10)
+    
+        for i, col in enumerate(('เลขที่อ้างอิงผู้ผลิต', 'สาขา', 'สินค้า', 'จำนวนตามเอกสาร', 'น้ำหนักตามเอกสาร')):
+            label = tk.Label(self.add_frame, text=col + ':')
+            label.grid(row=i + 3, column=0, pady=10, padx=(10, 0), sticky='e')
+            entry = tk.Entry(self.add_frame, font=("Helvetica", 20))
+            entry.grid(row=i + 3, column=1, pady=10, padx=(0, 10), sticky='w')
             self.entries[col] = entry
+    
+        # Center all columns
+        for i in range(2):  # Assuming there are 2 columns
+            self.add_frame.grid_columnconfigure(i, weight=1)
+    
+    
+        submit_frame = tk.Frame(self.add_frame, width=100)
+        submit_frame.grid(row=i + 7, column=0, columnspan=2, pady=20, padx=(10, 10))
+        submit_frame.grid_propagate(False)  # Prevents the frame to resize to fit its contents
+        self.submit_btn = tk.Button(submit_frame, text="Add Stock", command=self.add_gold_to_table)
+        self.submit_btn.pack(fill='both', expand=True)  # Makes the button fill the frame
 
-        self.submit_btn = tk.Button(self.add_frame, text="Add Stock", command=self.add_gold_to_table)
-        self.submit_btn.grid(row=i+3, column=0, columnspan=2, pady=20)
+        back_frame = tk.Frame(self.add_frame, width=100)
+        back_frame.grid(row=i + 8, column=0, columnspan=2, pady=20, padx=(10, 10))
+        back_frame.grid_propagate(False)
+        self.back_btn = tk.Button(back_frame, text="Back", command=self.show_main_interface)
+        self.back_btn.pack(fill='both', expand=True)
 
-        self.back_btn = tk.Button(self.add_frame, text="Back", command=self.show_main_interface)
-        self.back_btn.grid(row=i+4, column=0, columnspan=2, pady=20)
+
+
+
+
 
     def show_add_gold_interface(self):
         # Clear all entries

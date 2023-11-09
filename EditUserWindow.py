@@ -14,60 +14,61 @@ class EditStockUserWindow(tk.Toplevel):
 
         # Create a main frame
         self.main_frame = ttk.Frame(self)
-        self.main_frame.grid(sticky='nsew')
+        self.main_frame.pack(expand=True, fill="both")
 
         # Create a frame for the first row
         self.row1_frame = ttk.Frame(self.main_frame)
-        self.row1_frame.grid(row=0, column=0, sticky='nsew')
+        self.row1_frame.pack(expand=True, fill="both")
 
         self.tree_frame = ttk.Frame(self.row1_frame)
-        self.tree_frame.grid(row=0, column=0)
+        self.tree_frame.pack(expand=True, fill="both")
 
         self.init_tree(self.tree_frame)
 
         self.load_stocks_from_master()
 
         self.edit_button = tk.Button(self.row1_frame, text="Edit Selected Stock", command=self.edit_selected_stock)
-        self.edit_button.grid(row=1, column=0)
+        self.edit_button.pack()
 
         # Create a frame for the rest of the rows
         self.rest_frame = ttk.Frame(self.main_frame)
-        self.rest_frame.grid(row=1, column=0, sticky='nsew')
+        self.rest_frame.pack(expand=True, fill="both")
 
         self.edit_entries = {}
 
         row_num = 0  # Starting row number for labels and entry fields
 
-        for i, col in enumerate(('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง')):
+        for i, col in enumerate(('id', 'วันที่', 'เวลา', 'เลขที่อ้างอิงผู้ผลิต', 'สาขา', 'ผู้ตรวจ', 'สินค้า', 'จำนวนตามเอกสาร', 'น้ำหนักตามเอกสาร', 'จำนวนตามจริง', 'น้ำหนักตามตามจริง')):
             label = tk.Label(self.rest_frame, text=col)
-            label.grid(row=row_num + i // 2, column=i % 2 * 2)
+            label.grid(row=row_num + i // 2, column=i % 2 * 2, padx=10, pady=5, sticky='e')
 
-            if col in ('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร'):
+            if col in ('id', 'วันที่', 'เวลา', 'เลขที่อ้างอิงผู้ผลิต', 'สาขา', 'ผู้ตรวจ', 'สินค้า', 'จำนวนตามเอกสาร', 'น้ำหนักตามเอกสาร'):
                 value_label = tk.Label(self.rest_frame)
-                value_label.grid(row=row_num + i // 2, column=i % 2 * 2 + 1)
+                value_label.grid(row=row_num + i // 2, column=i % 2 * 2 + 1, padx=10, pady=5, sticky='w')
                 self.edit_entries[col] = value_label
             else:
-                entry = tk.Entry(self.rest_frame)
-                entry.grid(row=row_num + i // 2, column=i % 2 * 2 + 1)
+                entry = tk.Entry(self.rest_frame, font=("Helvetica", 20))
+                entry.grid(row=row_num + i // 2, column=i % 2 * 2 + 1, padx=10, pady=5, sticky='w')
                 self.edit_entries[col] = entry
 
-            # Add empty columns on either side of the labels and entries to center them
-            self.rest_frame.grid_columnconfigure(0, weight=1)  
-            self.rest_frame.grid_columnconfigure(3, weight=1)  
+            self.rest_frame.grid_columnconfigure(0, weight=1)
+            self.rest_frame.grid_columnconfigure(3, weight=1)
 
         # Button to save edits
         save_edit_btn = tk.Button(self.rest_frame, text="Save Edit", command=self.save_edited_gold)
-        save_edit_btn.grid(row=row_num + len(self.edit_entries) // 2 + 2, column=0, columnspan=4)
+        save_edit_btn.grid(row=row_num + len(self.edit_entries) // 2 + 2, column=0, columnspan=4, pady=20)
 
+        # Center columns
+        self.rest_frame.grid_columnconfigure(0, weight=1)
+        self.rest_frame.grid_columnconfigure(3, weight=1)
 
-    
     def init_tree(self, frame):
         self.tree_scroll = ttk.Scrollbar(frame)
         self.tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'), show='headings')
+
+        self.tree = ttk.Treeview(frame, yscrollcommand=self.tree_scroll.set, columns=('id', 'วันที่', 'เวลา', 'เลขที่อ้างอิงผู้ผลิต', 'สาขา', 'ผู้ตรวจ', 'สินค้า', 'จำนวนตามเอกสาร', 'น้ำหนักตามเอกสาร', 'จำนวนตามจริง', 'น้ำหนักตามตามจริง'), show='headings')
         self.tree.pack(pady=20)
-        
+
         self.tree_scroll.config(command=self.tree.yview)
         
         for col in ('id','วันที่','เวลา','เลขที่อ้างอิงผู้ผลิต','สาขา','ผู้ตรวจ','สินค้า','จำนวนตามเอกสาร','น้ำหนักตามเอกสาร','จำนวนตามจริง','น้ำหนักตามตามจริง'):
